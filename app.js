@@ -3,71 +3,58 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 const tours = JSON.parse(fs.readFileSync("./data/tours-simple.json"));
-app.get("/api/v1/tours", (req, res) => {
-	console.log(tours);
-	res.status(200).json({
-		state: "success",
-		length: tours.length,
-		data: {
-			tours,
-		},
-	});
-});
-app.get("/api/v1/tours/:userId", (req, res) => {
-	const id = req.params.userId * 1;
-	const searchedTours = tours.find((item) => item.id === id);
-	if (!searchedTours) {
-		return res.status(400).json({
-			status: "Error",
-			body: "Error 404 ",
-		});
-	}
-	res.status(200).json({
-		status: "Success",
-		body: searchedTours,
-	});
-});
-app.patch("/api/v1/tours/:id", (req, res) => {
-	const id = req.params.id;
-	console.log(req.body);
-	if (id > tours.length)
-		return res.status(400).json({
-			status: "failed",
-			message: "Error 404",
-		});
+function getAllTours(req, res) {
+	console.log(typeof tours);
 	res.status(200).json({
 		status: "success",
-		data: {
-			message: "This is successful",
-		},
+		result: tours.length,
+		data: tours,
 	});
-});
-app.post("/api/v1/tours", (req, res) => {
-	const newId = tours[tours.length - 1]._id + 1;
-	const newTour = Object.assign({ id: newId }, req.body);
-	console.log(tours.length);
+}
+function createPost(req, res) {
+	const id = tours[tours.length - 1].id + 1;
+	const newTour = Object.assign({ id }, req.body);
 	tours.push(newTour);
+	console.log(tours);
 	fs.writeFile("./data/tours-simple.json", JSON.stringify(tours), (err) => {
+		if (err) console.log("unable to write the file");
 		res.status(201).json({
+			method: "post",
 			status: "success",
-			data: {
-				tours: newTour,
-			},
+			data: newTour,
 		});
 	});
-});
-app.delete("/api/v1/tours/:id", (req, res) => {
+}
+function getTour(req, res) {
 	const id = req.params.id;
-	if (id > tours.length) {
-		return res.status(400).json({
-			status: "failed",
-			message: "Error",
-		});
-	}
-	res.status(204).json({
+	res.status(200).json({
+		status: "success",
+		data: tours.find((tour) => tour.id == id),
+	});
+}
+function updateTour(req, res) {
+	const id = req.params.id;
+	if (id > tours.length) res.status(404).json({ error: "Error 404" });
+	res.status(200).json({
+		status: "success",
+		message: "Updated the data",
+	});
+}
+function deleteTour(req, res) {
+	const id = req.params.id;
+	if (tours.length < id) res.status(404).json({ error: "Error 404" });
+	res.status(200).json({
+		status: "success",
+		message: "deleted",
 		data: null,
 	});
-});
-app.listen(8001, () => {
-	console.log("__Listening To Port 8001__");
+}
+app.route("/api/v1/tours").get(getAllTours).post(createPost);
+app
+	.route("/api/v1/tours/:id")
+	.get(getTour)
+	.patch(updateTour)
+	.delete(deleteTour);
+app.listen(8001, "127.0.0.1", () => {
+	console.log("__Listening to port 8001__");
 });
