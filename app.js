@@ -11,7 +11,7 @@ function getAllTours(req, res) {
 		data: tours,
 	});
 }
-function createPost(req, res) {
+function createTour(req, res) {
 	const id = tours[tours.length - 1].id + 1;
 	const newTour = Object.assign({ id }, req.body);
 	tours.push(newTour);
@@ -49,12 +49,28 @@ function deleteTour(req, res) {
 		data: null,
 	});
 }
-app.route("/api/v1/tours").get(getAllTours).post(createPost);
+app.route("/api/v1/tours").get(getAllTours).post(createTour);
 app
 	.route("/api/v1/tours/:id")
 	.get(getTour)
 	.patch(updateTour)
 	.delete(deleteTour);
+function getAllUsers(req, res) {
+	res.status(500).json({
+		status: "Error",
+		message: "Sorry can't load the users",
+	});
+}
+function getUser(req, res) {}
+function createUser(req, res) {}
+function updateUser(req, res) {}
+function deleteUser(req, res) {}
+app.route("/api/v1/users").get(getAllUsers).post(createUser);
+app
+	.route("/api/v1/users/:id")
+	.get(getUser)
+	.patch(updateUser)
+	.delete(deleteUser);
 app.listen(8001, "127.0.0.1", () => {
 	console.log("__Listening to port 8001__");
 });
