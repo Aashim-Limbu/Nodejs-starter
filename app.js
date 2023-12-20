@@ -1,8 +1,10 @@
 const fs = require("fs");
+const { v4 } = require("uuid");
 const express = require("express");
 const app = express();
 app.use(express.json());
 const tours = JSON.parse(fs.readFileSync("./data/tours-simple.json"));
+const users = JSON.parse(fs.readFileSync("./data/users.json"));
 function getAllTours(req, res) {
 	console.log(typeof tours);
 	res.status(200).json({
@@ -56,18 +58,53 @@ app
 	.patch(updateTour)
 	.delete(deleteTour);
 function getAllUsers(req, res) {
-	res.status(500).json({
-		status: "Error",
-		message: "Sorry can't load the users",
+	res.status(200).json({
+		status: "Success",
+		data: users,
+		message: "successful request",
 	});
 }
-function getUser(req, res) {}
-function createUser(req, res) {}
+function createUser(req, res) {
+	const newUser = {
+		_id: v4(),
+		data: req.body,
+		active: false,
+	};
+	users.push(newUser);
+	fs.writeFile("./data/users.json", JSON.stringify(users), (err) => {
+		if (err) return res.status(400).send("Error can't write the new Data");
+		res.status(201).json({
+			status: "successful",
+			newData: newUser,
+			message: "Created successfully",
+		});
+	});
+}
+function getUser(req, res) {
+	const { index } = req.params;
+	if (isNaN(index) || index < 1) {
+		return res.status(400).json({
+			status: "error",
+			message: "Invalid index",
+		});
+	}
+	const user = users[index - 1];
+	if (!user) {
+		return res.status(404).json({
+			status: "error",
+			message: "User not found",
+		});
+	}
+	res.status(200).json({
+		status: "success",
+		data: user,
+	});
+}
 function updateUser(req, res) {}
 function deleteUser(req, res) {}
 app.route("/api/v1/users").get(getAllUsers).post(createUser);
 app
-	.route("/api/v1/users/:id")
+	.route("/api/v1/users/:index")
 	.get(getUser)
 	.patch(updateUser)
 	.delete(deleteUser);
