@@ -3,10 +3,10 @@ const { v4 } = require("uuid");
 const express = require("express");
 const app = express();
 app.use(express.json());
-const tours = JSON.parse(fs.readFileSync("./data/tours-simple.json"));
-const users = JSON.parse(fs.readFileSync("./data/users.json"));
+let tours = JSON.parse(fs.readFileSync("./data/tours-simple.json"));
+let users = JSON.parse(fs.readFileSync("./data/users.json"));
 function getAllTours(req, res) {
-	console.log(typeof tours);
+
 	res.status(200).json({
 		status: "success",
 		result: tours.length,
@@ -17,9 +17,8 @@ function createTour(req, res) {
 	const id = tours[tours.length - 1].id + 1;
 	const newTour = Object.assign({ id }, req.body);
 	tours.push(newTour);
-	console.log(tours);
 	fs.writeFile("./data/tours-simple.json", JSON.stringify(tours), (err) => {
-		if (err) console.log("unable to write the file");
+		if (err) res.status(400).send("unable to write the file");
 		res.status(201).json({
 			method: "post",
 			status: "success",
@@ -51,12 +50,10 @@ function deleteTour(req, res) {
 		data: null,
 	});
 }
-app.route("/api/v1/tours").get(getAllTours).post(createTour);
-app
-	.route("/api/v1/tours/:id")
-	.get(getTour)
-	.patch(updateTour)
-	.delete(deleteTour);
+const toursRouter = express.Router();
+const usersRouter = express.Router();
+toursRouter.route("/").get(getAllTours).post(createTour);
+toursRouter.route("/:id").get(getTour).patch(updateTour).delete(deleteTour);
 function getAllUsers(req, res) {
 	res.status(200).json({
 		status: "Success",
@@ -100,14 +97,32 @@ function getUser(req, res) {
 		data: user,
 	});
 }
-function updateUser(req, res) {}
-function deleteUser(req, res) {}
-app.route("/api/v1/users").get(getAllUsers).post(createUser);
-app
-	.route("/api/v1/users/:index")
-	.get(getUser)
-	.patch(updateUser)
-	.delete(deleteUser);
+function updateUser(req, res) {
+	const { index } = req.params;
+	if (index > users.length)
+		res.status(400).send("Error can't update the users");
+	res.status(200).json({
+		status: "success",
+		data: users[index - 1],
+		message: "successfully updated",
+	});
+}
+function deleteUser(req, res) {
+	const id = req.params.index;
+	if (id > users.length) res.status(400).send("No user to delete");
+	users = users.filter((user, index) => id - 1 !== index);
+	fs.writeFile("./data/users.json", JSON.stringify(users), (err) => {
+		if (err) res.status(400).send("Can't delete the user");
+		res.status(200).json({
+			status: "success",
+			msg: "user deleted successfully",
+		});
+	});
+}
+usersRouter.route("/").get(getAllUsers).post(createUser);
+usersRouter.route("/:index").get(getUser).patch(updateUser).delete(deleteUser);
+app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/tours", toursRouter);
 app.listen(8001, "127.0.0.1", () => {
 	console.log("__Listening to port 8001__");
 });
