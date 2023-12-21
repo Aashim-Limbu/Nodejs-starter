@@ -1,6 +1,14 @@
 const fs = require("fs");
 const { v4 } = require("uuid");
 let users = JSON.parse(fs.readFileSync("./data/users.json"));
+function checkUser(req, res, next, val) {
+	if (val * 1 > users.length)
+		return res.status(400).json({
+			status: "ERROR",
+			msg: "invalid id",
+		});
+	next();
+}
 function getAllUsers(req, res) {
 	res.status(200).json({
 		status: "Success",
@@ -26,12 +34,6 @@ function createUser(req, res) {
 }
 function getUser(req, res) {
 	const { index } = req.params;
-	if (isNaN(index) || index < 1) {
-		return res.status(400).json({
-			status: "error",
-			message: "Invalid index",
-		});
-	}
 	const user = users[index - 1];
 	if (!user) {
 		return res.status(404).json({
@@ -46,8 +48,6 @@ function getUser(req, res) {
 }
 function updateUser(req, res) {
 	const { index } = req.params;
-	if (index > users.length)
-		res.status(400).send("Error can't update the users");
 	res.status(200).json({
 		status: "success",
 		data: users[index - 1],
@@ -56,7 +56,6 @@ function updateUser(req, res) {
 }
 function deleteUser(req, res) {
 	const id = req.params.index;
-	if (id > users.length) res.status(400).send("No user to delete");
 	users = users.filter((user, index) => id - 1 !== index);
 	fs.writeFile("./data/users.json", JSON.stringify(users), (err) => {
 		if (err) res.status(400).send("Can't delete the user");
@@ -71,3 +70,4 @@ exports.createUser = createUser;
 exports.getUser = getUser;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
+exports.checkUser = checkUser;
