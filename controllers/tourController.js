@@ -8,6 +8,16 @@ function checkId(req, res, next, val) {
 		});
 	next();
 }
+function checkBody(req, res, next) {
+    console.log("hi from the checkBody")
+	if (req.body.name && req.body.price) next();
+	else {
+		return res.status(400).json({
+			status: "error",
+			message: "invalid body",
+		});
+	}
+}
 function getAllTours(req, res) {
 	res.status(200).json({
 		status: "success",
@@ -54,3 +64,4 @@ exports.getTour = getTour;
 exports.updateTour = updateTour;
 exports.deleteTour = deleteTour;
 exports.checkId = checkId;
+exports.checkBody = checkBody;
