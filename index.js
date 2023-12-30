@@ -1,5 +1,6 @@
 const fs = require('fs');
 const server = require('http').createServer();
+
 server.on('request', (req, res) => {
   //request type 1
   // fs.readFile("./data/tours.json", (err, data) => {

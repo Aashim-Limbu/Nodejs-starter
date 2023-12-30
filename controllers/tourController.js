@@ -1,24 +1,33 @@
 const Tour = require('../models/tourModel');
 
-// const tours = JSON.parse(fs.readFileSync('./data/tours-simple.json'));
-
-function getAllTours(req, res) {
-  res.status(200).json({
-    status: 'success',
-    // result: tours.length,
-    // data: tours,
-  });
+async function getAllTours(req, res) {
+  try {
+    const tours = await Tour.find();
+    res.status(200).json({
+      status: 'success',
+      length: tours.length,
+      data: {
+        tours,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'Error',
+      msg: error,
+    });
+  }
 }
 async function createTour(req, res) {
   try {
     const newTour = await Tour.create(req.body);
-    res.status(201).json({
+    console.log(newTour);
+    return res.status(201).json({
       method: 'post',
       status: 'success',
       data: newTour,
     });
   } catch (e) {
-    res.status(400).json({
+    return res.status(400).json({
       status: 'failed',
       message: e,
     });
