@@ -21,30 +21,53 @@ async function createTour(req, res) {
   try {
     const newTour = await Tour.create(req.body);
     console.log(newTour);
-    return res.status(201).json({
+    res.status(201).json({
       method: 'post',
       status: 'success',
       data: newTour,
     });
   } catch (e) {
-    return res.status(400).json({
+    res.status(400).json({
       status: 'failed',
       message: e,
     });
   }
 }
-function getTour(req, res) {
+async function getTour(req, res) {
   //   const { id } = req.params;
-  res.status(200).json({
-    status: 'success',
-    // data: tours.find((tour) => tour.id === id),
-  });
+  try {
+    const tour = await Tour.findById(req.params.id);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'failed',
+      msg: error,
+    });
+  }
 }
-function updateTour(req, res) {
-  res.status(200).json({
-    status: 'success',
-    message: 'Updated the data',
-  });
+async function updateTour(req, res) {
+  try {
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'failed',
+      message: error,
+    });
+  }
 }
 function deleteTour(req, res) {
   res.status(200).json({
