@@ -2,7 +2,17 @@ const Tour = require('../models/tourModel');
 
 async function getAllTours(req, res) {
   try {
-    const tours = await Tour.find();
+    const searchQuery = { ...req.query };
+    const keys = ['page', 'limit', 'sort', 'fields'];
+    keys.forEach((key) => delete searchQuery[key]);
+    //Advance filtering
+    let tempQuery = JSON.stringify(searchQuery);
+    tempQuery = JSON.parse(
+      tempQuery.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`),
+    );
+    console.log(tempQuery);
+    const query = Tour.find(tempQuery);
+    const tours = await query;
     res.status(200).json({
       status: 'success',
       length: tours.length,
@@ -69,13 +79,27 @@ async function updateTour(req, res) {
     });
   }
 }
-function deleteTour(req, res) {
-  res.status(200).json({
-    status: 'success',
-    message: 'deleted',
-    data: null,
-  });
+async function deleteTour(req, res) {
+  try {
+    const response = await Tour.findByIdAndDelete(req.params.id);
+    if (!response) {
+      return res
+        .status(404)
+        .json({ status: 'failed', message: 'No tour found with this ID.' });
+    }
+    res.status(204).json({
+      status: 'success',
+      data: null,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: 'failed',
+      message: 'An error occurred while deleting the tour.',
+    });
+  }
 }
+
 exports.getAllTours = getAllTours;
 exports.createTour = createTour;
 exports.getTour = getTour;
