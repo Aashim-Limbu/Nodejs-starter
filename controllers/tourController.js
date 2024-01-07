@@ -1,17 +1,53 @@
 const Tour = require('../models/tourModel');
 
+function setParameter(req, res, next) {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,maxGroupSize';
+  next();
+}
 async function getAllTours(req, res) {
   try {
     const searchQuery = { ...req.query };
     const keys = ['page', 'limit', 'sort', 'fields'];
     keys.forEach((key) => delete searchQuery[key]);
-    //Advance filtering
+    //! 1)Advance filtering
     let tempQuery = JSON.stringify(searchQuery);
     tempQuery = JSON.parse(
       tempQuery.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`),
     );
-    console.log(tempQuery);
-    const query = Tour.find(tempQuery);
+    let query = Tour.find(tempQuery);
+    //! 2) Sorting the data
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      console.log(sortBy);
+      query = query.sort(sortBy);
+    } else {
+      query.sort('-createdAt');
+    }
+    //! Limiting the data
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
+    //! Pagination
+    if (req.query.page || req.query.limit) {
+      console.log('inside the pagination');
+      const page = req.query.page * 1 || 1;
+      const limit = req.query.limit * 1 || 10;
+      const skip = (page - 1) * limit;
+      console.log('Page:', page);
+      console.log('Limit:', limit);
+      console.log('Skip:', skip);
+      query = query.skip(skip).limit(limit);
+      console.log(query);
+      const numTours = await Tour.countDocuments(tempQuery);
+      if (skip >= numTours) {
+        throw new Error("Sorry the data doesn't exists");
+      }
+    }
     const tours = await query;
     res.status(200).json({
       status: 'success',
@@ -21,9 +57,10 @@ async function getAllTours(req, res) {
       },
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({
       status: 'Error',
-      msg: error,
+      msg: error.message,
     });
   }
 }
@@ -44,7 +81,6 @@ async function createTour(req, res) {
   }
 }
 async function getTour(req, res) {
-  //   const { id } = req.params;
   try {
     const tour = await Tour.findById(req.params.id);
     res.status(200).json({
@@ -100,8 +136,11 @@ async function deleteTour(req, res) {
   }
 }
 
-exports.getAllTours = getAllTours;
-exports.createTour = createTour;
-exports.getTour = getTour;
-exports.updateTour = updateTour;
-exports.deleteTour = deleteTour;
+module.exports = {
+  getAllTours,
+  createTour,
+  getTour,
+  updateTour,
+  deleteTour,
+  setParameter,
+};
