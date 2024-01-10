@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const APIFeature = require('../utils/APIFeaures');
 
 function setParameter(req, res, next) {
   req.query.limit = '5';
@@ -6,55 +7,7 @@ function setParameter(req, res, next) {
   req.query.fields = 'name,price,ratingsAverage,summary,maxGroupSize';
   next();
 }
-class APIFeature {
-  constructor(query, queryString) {
-    this.query = query;
-    this.queryString = queryString;
-  }
 
-  filter() {
-    const searchQuery = { ...this.queryString };
-    const keys = ['page', 'limit', 'sort', 'fields'];
-    keys.forEach((key) => delete searchQuery[key]);
-    let tempQuery = JSON.stringify(searchQuery);
-    tempQuery = JSON.parse(
-      tempQuery.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`),
-    );
-    this.query = Tour.find(tempQuery);
-    return this;
-  }
-
-  sort() {
-    if (this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(',').join(' ');
-      console.log(sortBy);
-      this.query = this.query.sort(sortBy);
-    } else {
-      this.query = this.query.sort('-createdAt');
-    }
-    return this;
-  }
-
-  limit() {
-    if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').join(' ');
-      this.query = this.query.select(fields);
-    } else {
-      this.query = this.query.select('-__v');
-    }
-    return this;
-  }
-
-  page() {
-    if (this.queryString.page || this.queryString.limit) {
-      const page = this.queryString.page * 1 || 1;
-      const limit = this.queryString.limit * 1 || 10;
-      const skip = (page - 1) * limit;
-      this.query = this.query.skip(skip).limit(limit);
-    }
-    return this;
-  }
-}
 async function getAllTours(req, res) {
   try {
     // const searchQuery = { ...req.query };
@@ -111,7 +64,71 @@ async function getAllTours(req, res) {
       },
     });
   } catch (error) {
-    console.log(error);
+    res.status(400).json({
+      status: 'Error',
+      msg: error.message,
+    });
+  }
+}
+async function getTheBusyMonth(req, res) {
+  try {
+    const year = req.params.year * 1;
+    const data = await Tour.aggregate([
+      { $unwind: '$startDates' },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: '$startDates' }, //grouping based on the months
+          numberOfTour: { $sum: 1 },
+          tours: { $push: '$name' },
+        },
+      },
+      { $project: { _id: 0 } }, //to remove the fields in the data
+      { $addFields: { months: '$_id' } }, //add the fieldds
+      { $sort: { numberOfTour: -1 } },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      length: data.length,
+      year,
+      data,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'Error',
+      msg: error.message,
+    });
+  }
+}
+async function getTourStats(req, res) {
+  try {
+    const stats = await Tour.aggregate([
+      { $match: { ratingsAverage: { $gte: 4.5 } } },
+      {
+        $group: {
+          _id: null,
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minRating: { $min: '$ratingsAverage' },
+          maxRating: { $max: '$ratingsAverage' },
+          noOfTour: { $sum: 1 },
+        },
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        stats,
+      },
+    });
+  } catch (error) {
     res.status(400).json({
       status: 'Error',
       msg: error.message,
@@ -197,4 +214,6 @@ module.exports = {
   updateTour,
   deleteTour,
   setParameter,
+  getTourStats,
+  getTheBusyMonth,
 };
