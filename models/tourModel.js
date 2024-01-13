@@ -11,7 +11,7 @@ const tourSchema = new Schema(
       trim: true,
     },
     secretTour: {
-      type: String,
+      type: Boolean,
       default: false,
     },
     slug: String,
@@ -68,19 +68,32 @@ const tourSchema = new Schema(
 tourSchema.virtual('durationInWeeks').get(function () {
   return this.duration / 7;
 });
-// tourSchema.pre('save', function (next) {
-//   this.slug = slugify(this.name, { lower: true });
-//   next();
-// });
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 // tourSchema.post('save', function (doc, next) {
 //   //^   console.log('this is from the post doc middleware');
 //   console.log(doc);
 //   next();
 // });
-tourSchema.pre('find', function (next) {
+
+tourSchema.pre(/^find/, function (next) {
+  //^ this run for every string starting with find [find,findOne,findById etc, ...]
   this.find({ secretTour: { $ne: true } });
   next();
 });
 
+//! Aggregation Middlewares
+//if we need to hide the data while in the aggregation also we use the aggregation middlewares
+tourSchema.pre('aggregate', function (next) {
+  //   console.log(
+  //     'this will give all the aggregation method that we had used ',
+  //     this.pipeline(),
+  //   );
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  console.log(this.pipeline());
+  next();
+});
 const Tour = mongoose.model('Tour', tourSchema);
 module.exports = Tour;
