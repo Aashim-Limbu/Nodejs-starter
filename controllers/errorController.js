@@ -43,7 +43,6 @@ module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'Error';
   if (process.env.NODE_ENV === 'production') {
-    console.log('this is production error ');
     //I see since the error[name] lies in the prototype of an object so to get the prototype of object too we use Object.create()
     //{...err} //!It is only the sallow copy of the err since it don't get the prototype property to get we use Object.create()
     let error = Object.create(err);
@@ -53,7 +52,6 @@ module.exports = (err, req, res, next) => {
       error = handleValidationErrorDB(error);
     ProdErrorMessage(res, error);
   } else {
-    console.log("we're in the dev");
     DevErrorMessage(res, err);
   }
 };

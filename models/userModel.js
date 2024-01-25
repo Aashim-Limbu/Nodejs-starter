@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcrypt');
 
 const { Schema } = mongoose;
 
@@ -31,11 +32,24 @@ const userSchema = new Schema({
   password: {
     type: String,
     minLength: [8, 'A password must be greater than 8 characters'],
+    maxLength: [30, 'A password must be lesser than 30 characters'],
+    select: false,
   },
   passwordConfirm: {
     type: String,
-    minlength: [8, "Password doesn't match"],
+    required: [true, 'A password must be confirmed to signUp the user'],
+    validate: {
+      validator: function (conf) {
+        return this.password === conf;
+      },
+      message: 'The Password do not match with each other',
+    },
   },
+});
+userSchema.pre('save', async function (next) {
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
 });
 const User = mongoose.model('users', userSchema);
 module.exports = User;
