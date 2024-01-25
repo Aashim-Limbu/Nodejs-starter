@@ -2,6 +2,7 @@ const fs = require('fs');
 const { v4 } = require('uuid');
 
 let users = JSON.parse(fs.readFileSync('./data/users.json'));
+
 function checkUser(req, res, next, val) {
   if (val * 1 > users.length)
     return res.status(400).json({

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const { Schema } = mongoose;
 
@@ -46,7 +46,17 @@ const userSchema = new Schema({
     },
   },
 });
+
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  password,
+) {
+  return await bcrypt.compare(candidatePassword, password);
+};
+
+//encrypting the password before saving in the database
 userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
   next();

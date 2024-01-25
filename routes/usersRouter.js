@@ -15,6 +15,7 @@ const router = express.Router();
 //the checkUser also have the argument req,res,next,val where val is used to check the value of the index sent
 // since a router is specified to a particular  Router so the router.param is bound with the userRouter
 router.route('/signup').post(authController.signUp);
+router.route('/signin').post(authController.signIn);
 router.param('index', checkUser);
 router.route('/').get(getAllUsers).post(createUser);
 router.route('/:index').get(getUser).patch(updateUser).delete(deleteUser);
