@@ -45,6 +45,7 @@ const userSchema = new Schema({
       message: 'The Password do not match with each other',
     },
   },
+  passwordChangesAt: Date,
 });
 
 userSchema.methods.correctPassword = async function (
@@ -52,6 +53,16 @@ userSchema.methods.correctPassword = async function (
   password,
 ) {
   return await bcrypt.compare(candidatePassword, password);
+};
+userSchema.methods.changePasswordAfter = async function (JWTTimeStamp) {
+  if (this.passwordChangesAt) {
+    const changedTimeStamp = new Date(this.passwordChangesAt).getTime() / 1000;
+    console.log(this.passwordChangesAt, changedTimeStamp);
+    console.log(JWTTimeStamp, changedTimeStamp);
+    return JWTTimeStamp < changedTimeStamp; //if false then it suggest the token is issued later than the password change
+    //changedTimeStamp is from database and the JWTTimeStamp is created as the token is created [decoded token have the iat and exp fields]
+  }
+  return false; //false means the date have not been changed
 };
 
 //encrypting the password before saving in the database

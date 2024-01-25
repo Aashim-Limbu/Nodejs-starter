@@ -39,6 +39,12 @@ function handleValidationErrorDB(err) {
   return new AppError(message, 400);
 }
 
+function handleErrorWebToken() {
+  return new AppError('Invalid Token', 401);
+}
+function handleExpireWebToken() {
+  return new AppError('Token has expired please login again', 401);
+}
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'Error';
@@ -50,6 +56,8 @@ module.exports = (err, req, res, next) => {
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
     if (error.name === 'ValidationError')
       error = handleValidationErrorDB(error);
+    if (error.name === 'JsonWebTokenError') error = handleErrorWebToken();
+    if (error.name === 'TokenExpiredError') error = handleExpireWebToken();
     ProdErrorMessage(res, error);
   } else {
     DevErrorMessage(res, err);

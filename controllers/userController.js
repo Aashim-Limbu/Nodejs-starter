@@ -1,23 +1,26 @@
-const fs = require('fs');
-const { v4 } = require('uuid');
+// const fs = require('fs');
+// const { v4 } = require('uuid');
+const User = require('../models/userModel');
+const catchAsync = require('../utils/catchAsync');
 
-let users = JSON.parse(fs.readFileSync('./data/users.json'));
-
-function checkUser(req, res, next, val) {
-  if (val * 1 > users.length)
-    return res.status(400).json({
-      status: 'ERROR',
-      msg: 'invalid id',
-    });
-  next();
-}
-function getAllUsers(req, res) {
+// function checkUser(req, res, next, val) {
+//   if (val * 1 > users.length)
+//     return res.status(400).json({
+//       status: 'ERROR',
+//       msg: 'invalid id',
+//     });
+//   next();
+// }
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find();
   res.status(200).json({
     status: 'Success',
     data: users,
     message: 'successful request',
   });
-}
+});
+
+/*
 function createUser(req, res) {
   const newUser = {
     _id: v4(),
@@ -67,9 +70,11 @@ function deleteUser(req, res) {
     });
   });
 }
+
 exports.getAllUsers = getAllUsers;
 exports.createUser = createUser;
 exports.getUser = getUser;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
 exports.checkUser = checkUser;
+*/
