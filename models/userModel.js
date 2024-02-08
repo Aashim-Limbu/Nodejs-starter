@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
 
@@ -25,7 +26,9 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
+    enum: ['user', 'admin', 'lead-guide', 'guide'],
     required: [true, 'A user must define the role'],
+    default: 'user',
   },
   active: Boolean,
   photo: String,
@@ -46,9 +49,12 @@ const userSchema = new Schema({
     },
   },
   passwordChangesAt: Date,
+  passwordResetToken: String,
+  passwodResetTokenExpires: Date,
 });
 
 userSchema.methods.correctPassword = async function (
+  //we could have used this.password but here since this.password is select:none so we pass it as a argument
   candidatePassword,
   password,
 ) {
@@ -64,7 +70,20 @@ userSchema.methods.changePasswordAfter = async function (JWTTimeStamp) {
   }
   return false; //false means the date have not been changed
 };
-
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  this.passwodResetTokenExpires = Date.now() + 10 * 60 * 1000;
+  return resetToken;
+};
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || !this.isNew) return next();
+  this.passwordChangesAt = Date.now() - 1000; //we did -1000 since saving the password in the DB's can be longer then isuuing the jwtToken {iat}
+  next();
+});
 //encrypting the password before saving in the database
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();

@@ -1,6 +1,7 @@
 require('dotenv').config({ path: './config.env' });
 const mongoose = require('mongoose');
 const app = require('./app');
+const catchAsync = require('./utils/catchAsync');
 
 process.on('uncaughtException', (err) => {
   console.log('Uncaught Exception error', err);
@@ -11,17 +12,12 @@ const db = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD,
 );
-async function connectToDatabase() {
-  try {
-    const response = await mongoose.connect(db);
-
-    if (response) {
-      console.log('DB connected successfully');
-    }
-  } catch (error) {
-    console.error('Error connecting to the database:', error.message);
+const connectToDatabase = catchAsync(async () => {
+  const response = await mongoose.connect(db);
+  if (response) {
+    console.log('DB connected successfully');
   }
-}
+});
 
 // Express server setup
 const PORT = process.env.PORT || 8001;

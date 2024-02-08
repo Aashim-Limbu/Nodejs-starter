@@ -16,8 +16,18 @@ const router = express.Router();
 // since a router is specified to a particular  Router so the router.param is bound with the userRouter
 router.route('/signup').post(authController.signUp);
 router.route('/signin').post(authController.signIn);
+router.route('/forgotPassword').post(authController.forgotPassword);
+router.route('/resetPassword/:resetToken').patch(authController.resetPassword);
 // router.param('index', checkUser);
 router.route('/').get(authController.control, userController.getAllUsers);
 // .post(createUser);
-// router.route('/:index').get(getUser).patch(updateUser).delete(deleteUser);
+router
+  .route('/:id')
+  .get(userController.getUser)
+  .patch(userController.updateUser)
+  .delete(
+    authController.control,
+    authController.restrictTo('admin', 'lead-guide'),
+    userController.deleteUser,
+  );
 module.exports = router;

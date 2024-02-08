@@ -1,6 +1,7 @@
 // const fs = require('fs');
 // const { v4 } = require('uuid');
 const User = require('../models/userModel');
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 // function checkUser(req, res, next, val) {
@@ -20,61 +21,48 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 
-/*
-function createUser(req, res) {
-  const newUser = {
-    _id: v4(),
-    data: req.body,
-    active: false,
-  };
-  users.push(newUser);
-  fs.writeFile('./data/users.json', JSON.stringify(users), (err) => {
-    if (err) return res.status(400).send("Error can't write the new Data");
-    res.status(201).json({
-      status: 'successful',
-      newData: newUser,
-      message: 'Created successfully',
-    });
+exports.createUser = catchAsync(async (req, res) => {
+  const newUser = await User.create(Object.assign({ active: false }, req.body));
+  res.status(200).json({
+    status: 'success',
+    data: newUser,
   });
-}
-function getUser(req, res) {
-  const { index } = req.params;
-  const user = users[index - 1];
+});
+exports.getUser = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
   if (!user) {
-    return res.status(404).json({
-      status: 'error',
-      message: 'User not found',
-    });
+    return next(new AppError('Sorry User not found', 404));
   }
   res.status(200).json({
     status: 'success',
     data: user,
   });
-}
-function updateUser(req, res) {
-  const { index } = req.params;
+});
+exports.updateUser = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const user = User.findByIdAndUpdate(id, req.body, {
+    runValidators: true,
+    new: true,
+  });
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
   res.status(200).json({
     status: 'success',
-    data: users[index - 1],
-    message: 'successfully updated',
+    data: user,
   });
-}
-function deleteUser(req, res) {
-  const id = req.params.index;
-  users = users.filter((user, index) => id - 1 !== index);
-  fs.writeFile('./data/users.json', JSON.stringify(users), (err) => {
-    if (err) res.status(400).send("Can't delete the user");
-    res.status(200).json({
-      status: 'success',
-      msg: 'user deleted successfully',
-    });
+});
+exports.deleteUser = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const user = await User.findByIdAndDelete(id);
+  if (!user) {
+    return next(new AppError('User Not Found', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    message: 'User deleted successfully',
   });
-}
+});
 
-exports.getAllUsers = getAllUsers;
-exports.createUser = createUser;
-exports.getUser = getUser;
-exports.updateUser = updateUser;
-exports.deleteUser = deleteUser;
-exports.checkUser = checkUser;
-*/
+// exports.checkUser = checkUser;
