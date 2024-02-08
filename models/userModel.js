@@ -79,16 +79,16 @@ userSchema.methods.createPasswordResetToken = function () {
   this.passwodResetTokenExpires = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
-userSchema.pre('save', function (next) {
-  if (!this.isModified('password') || !this.isNew) return next();
-  this.passwordChangesAt = Date.now() - 1000; //we did -1000 since saving the password in the DB's can be longer then isuuing the jwtToken {iat}
-  next();
-});
 //encrypting the password before saving in the database
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
+  next();
+});
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordChangesAt = Date.now() - 1000; //we did -1000 since saving the password in the DB's can be longer then isuuing the jwtToken {iat}
   next();
 });
 const User = mongoose.model('users', userSchema);

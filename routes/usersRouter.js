@@ -18,6 +18,9 @@ router.route('/signup').post(authController.signUp);
 router.route('/signin').post(authController.signIn);
 router.route('/forgotPassword').post(authController.forgotPassword);
 router.route('/resetPassword/:resetToken').patch(authController.resetPassword);
+router
+  .route('/updateMyPassword')
+  .patch(authController.control, authController.updatePassword);
 // router.param('index', checkUser);
 router.route('/').get(authController.control, userController.getAllUsers);
 // .post(createUser);

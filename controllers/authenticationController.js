@@ -145,14 +145,14 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   });
 });
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ id: req.user._id }).select('+password');
-  const { password } = req.body;
-  if (!(await user.correctPassword(user.password, password))) {
+  const user = await User.findById(req.user._id).select('+password');
+  const { password, passwordConfirm, currentPassword } = req.body;
+  if (!(await user.correctPassword(currentPassword, user.password))) {
     return next(new AppError('Wrong Password !', 401));
   }
   user.password = password;
-  user.passwordConfirm = password;
-  user.save();
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
   createSendToken(user, 200, res);
   //   const token = signToken(user._id);
   //   res.status(200).json({
