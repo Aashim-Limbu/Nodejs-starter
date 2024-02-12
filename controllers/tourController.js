@@ -11,7 +11,6 @@ function setParameter(req, res, next) {
 }
 const getAllTours = catchAsync(async (req, res) => {
   /*
-  {
     const searchQuery = { ...req.query };
   const keys = ['page', 'limit', 'sort', 'fields'];
   keys.forEach((key) => delete searchQuery[key]);
@@ -51,7 +50,6 @@ const getAllTours = catchAsync(async (req, res) => {
     if (skip >= numTours) {
       throw new Error("Sorry the data doesn't exists");
     }
-  }
 }*/
   const features = new APIFeature(Tour.find(), req.query)
     .filter()

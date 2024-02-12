@@ -21,9 +21,15 @@ router.route('/resetPassword/:resetToken').patch(authController.resetPassword);
 router
   .route('/updateMyPassword')
   .patch(authController.control, authController.updatePassword);
+router
+  .route('/updateMe')
+  .patch(authController.control, userController.updateMe);
 // router.param('index', checkUser);
-router.route('/').get(authController.control, userController.getAllUsers);
 // .post(createUser);
+router.route('/').get(authController.control, userController.getAllUsers);
+router
+  .route('/deleteMe')
+  .delete(authController.control, userController.deleteMe);
 router
   .route('/:id')
   .get(userController.getUser)

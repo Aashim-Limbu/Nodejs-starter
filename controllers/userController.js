@@ -12,6 +12,14 @@ const catchAsync = require('../utils/catchAsync');
 //     });
 //   next();
 // }
+function filterObject(body, ...allowededFields) {
+  const filteredObject = {};
+  Object.keys(body).forEach((el) => {
+    if (!allowededFields.includes(el)) return;
+    filteredObject[el] = body[el];
+  });
+  return filteredObject;
+}
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
   res.status(200).json({
@@ -64,5 +72,29 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     message: 'User deleted successfully',
   });
 });
-
+exports.updateMe = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError('This is not the route to change the password!', 400),
+    );
+  }
+  const filteredBody = filterObject(req.body, 'name', 'email');
+  const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
+    runValidators: true,
+    new: true,
+  });
+  res.status(200).json({
+    status: 'Success',
+    data: {
+      user: updatedUser,
+    },
+  });
+});
+exports.deleteMe = catchAsync(async (req, res) => {
+  await User.findByIdAndUpdate(req.user._id, { active: false });
+  res.status(204).json({
+    status: 'Success',
+    date: null,
+  });
+});
 // exports.checkUser = checkUser;

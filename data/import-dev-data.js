@@ -1,11 +1,9 @@
-require('dotenv').config({ path: '../config.env' });
+require('dotenv').config({ path: './config.env' });
 const mongoose = require('mongoose');
 const fs = require('fs');
 const Tour = require('../models/tourModel');
 
-const tours = JSON.parse(
-  fs.readFileSync('./../data/tours-simple.json', 'utf-8'),
-);
+const tours = JSON.parse(fs.readFileSync('./data/tours.json', 'utf-8'));
 const db = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD,

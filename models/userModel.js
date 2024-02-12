@@ -30,7 +30,6 @@ const userSchema = new Schema({
     required: [true, 'A user must define the role'],
     default: 'user',
   },
-  active: Boolean,
   photo: String,
   password: {
     type: String,
@@ -48,11 +47,19 @@ const userSchema = new Schema({
       message: 'The Password do not match with each other',
     },
   },
-  passwordChangesAt: Date,
+  passwordChangedAt: Date,
   passwordResetToken: String,
   passwodResetTokenExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
-
+userSchema.pre('/^find/', function (next) {
+  this.select({ active: true });
+  next();
+});
 userSchema.methods.correctPassword = async function (
   //we could have used this.password but here since this.password is select:none so we pass it as a argument
   candidatePassword,
@@ -61,10 +68,8 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, password);
 };
 userSchema.methods.changePasswordAfter = async function (JWTTimeStamp) {
-  if (this.passwordChangesAt) {
-    const changedTimeStamp = new Date(this.passwordChangesAt).getTime() / 1000;
-    console.log(this.passwordChangesAt, changedTimeStamp);
-    console.log(JWTTimeStamp, changedTimeStamp);
+  if (this.passwordChangedAt) {
+    const changedTimeStamp = new Date(this.passwordChangedAt).getTime() / 1000;
     return JWTTimeStamp < changedTimeStamp; //if false then it suggest the token is issued later than the password change
     //changedTimeStamp is from database and the JWTTimeStamp is created as the token is created [decoded token have the iat and exp fields]
   }
@@ -79,6 +84,10 @@ userSchema.methods.createPasswordResetToken = function () {
   this.passwodResetTokenExpires = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
+userSchema.pre('/^find/', function (next) {
+  this.select({ active: { $ne: false } });
+  next();
+});
 //encrypting the password before saving in the database
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
@@ -88,7 +97,7 @@ userSchema.pre('save', async function (next) {
 });
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
-  this.passwordChangesAt = Date.now() - 1000; //we did -1000 since saving the password in the DB's can be longer then isuuing the jwtToken {iat}
+  this.passwordChangedAt = Date.now() - 1000; //we did -1000 since saving the password in the DB's can be longer then isuuing the jwtToken {iat}
   next();
 });
 const User = mongoose.model('users', userSchema);

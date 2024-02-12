@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const User = require('./userModel');
 
 const { Schema } = mongoose;
 const tourSchema = new Schema(
@@ -47,7 +48,7 @@ const tourSchema = new Schema(
       type: String,
       required: [true, 'A tour must have the difficulty'],
       enum: {
-        values: ['hard', 'easy', 'medium'],
+        values: ['difficult', 'easy', 'medium'],
         message: '{VALUE} is not a valid difficulty level!',
       },
     },
@@ -67,6 +68,35 @@ const tourSchema = new Schema(
       default: Date.now(),
     },
     startDates: [Date],
+    startLocation: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point',
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    guides: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: User,
+      },
+    ],
+    locations: [
+      {
+        type: {
+          type: String,
+          enum: ['Point'],
+          default: 'Point',
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -89,6 +119,13 @@ tourSchema.pre('save', function (next) {
 tourSchema.pre(/^find/, function (next) {
   //^ this run for every string starting with find [find,findOne,findById etc, ...]
   this.find({ secretTour: { $ne: true } });
+  next();
+});
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
   next();
 });
 

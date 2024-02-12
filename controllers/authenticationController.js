@@ -13,13 +13,21 @@ function signToken(id) {
 }
 function createSendToken(user, statusCode, res) {
   const token = signToken(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    ),
+  };
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  res.cookie('jwt', token, cookieOptions);
+  user.password = undefined;
   res.status(statusCode).json({
     status: 'success',
     token,
   });
 }
 exports.signUp = catchAsync(async (req, res) => {
-  const { name, email, password, passwordConfirm, role, passwordChangesAt } =
+  const { name, email, password, passwordConfirm, role, passwordChangedAt } =
     req.body;
   const user = await User.create({
     name,
@@ -27,7 +35,7 @@ exports.signUp = catchAsync(async (req, res) => {
     password,
     passwordConfirm,
     role,
-    passwordChangesAt,
+    passwordChangedAt,
   });
   createSendToken(user, 201, res);
   //   const token = signToken(user._id);
@@ -160,6 +168,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   //     token,
   //   });
 });
+
 exports.restrictTo =
   (...roles) =>
   (req, res, next) => {
