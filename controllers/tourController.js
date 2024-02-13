@@ -1,6 +1,7 @@
 const Tour = require('../models/tourModel');
 const APIFeature = require('../utils/APIFeaures');
-const AppError = require('../utils/appError');
+// const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
 
 function setParameter(req, res, next) {
@@ -119,53 +120,22 @@ const getTourStats = catchAsync(async (req, res, next) => {
   });
 });
 
-const createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-  console.log(newTour);
-  res.status(201).json({
-    method: 'post',
-    status: 'success',
-    data: newTour,
-  });
-});
-const getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
-  if (!tour) {
-    return next(new AppError(`No tour with ${req.params.id} was found `, 404));
-  }
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
-const updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  if (!tour) {
-    return next(new AppError(`No tour with ${req.params.id} was found `, 404));
-  }
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
-const deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
-  if (!tour) {
-    return next(new AppError(`No tour with ${req.params.id} was found `, 404));
-  }
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
-
+// const getTour = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findById(req.params.id).populate('reviews');
+//   if (!tour) {
+//     return next(new AppError(`No tour with ${req.params.id} was found `, 404));
+//   }
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       tour,
+//     },
+//   });
+// });
+const getTour = factory.getOne(Tour, 'reviews');
+const createTour = factory.createOne(Tour);
+const updateTour = factory.updateOne(Tour);
+const deleteTour = factory.deleteOne(Tour);
 module.exports = {
   getAllTours,
   createTour,

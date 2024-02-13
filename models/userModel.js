@@ -100,5 +100,5 @@ userSchema.pre('save', function (next) {
   this.passwordChangedAt = Date.now() - 1000; //we did -1000 since saving the password in the DB's can be longer then isuuing the jwtToken {iat}
   next();
 });
-const User = mongoose.model('users', userSchema);
+const User = mongoose.model('User', userSchema);
 module.exports = User;

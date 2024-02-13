@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const Review = require('./reviewModel');
 const User = require('./userModel');
 
 const { Schema } = mongoose;
@@ -105,6 +106,11 @@ const tourSchema = new Schema(
 );
 tourSchema.virtual('durationInWeeks').get(function () {
   return this.duration / 7;
+});
+tourSchema.virtual('reviews', {
+  ref: Review,
+  foreignField: 'tour',
+  localField: '_id',
 });
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });

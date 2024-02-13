@@ -26,17 +26,16 @@ router
   .patch(authController.control, userController.updateMe);
 // router.param('index', checkUser);
 // .post(createUser);
-router.route('/').get(authController.control, userController.getAllUsers);
 router
   .route('/deleteMe')
   .delete(authController.control, userController.deleteMe);
 router
   .route('/:id')
   .get(userController.getUser)
-  .patch(userController.updateUser)
   .delete(
     authController.control,
     authController.restrictTo('admin', 'lead-guide'),
     userController.deleteUser,
-  );
+  )
+  .patch(userController.updateUser);
 module.exports = router;
