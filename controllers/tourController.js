@@ -1,5 +1,5 @@
 const Tour = require('../models/tourModel');
-const APIFeature = require('../utils/APIFeaures');
+// const APIFeature = require('../utils/APIFeaures');
 // const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
@@ -10,62 +10,6 @@ function setParameter(req, res, next) {
   req.query.fields = 'name,price,ratingsAverage,summary,maxGroupSize';
   next();
 }
-const getAllTours = catchAsync(async (req, res) => {
-  /*
-    const searchQuery = { ...req.query };
-  const keys = ['page', 'limit', 'sort', 'fields'];
-  keys.forEach((key) => delete searchQuery[key]);
-  //! 1)Advance filtering
-  let tempQuery = JSON.stringify(searchQuery);
-  tempQuery = JSON.parse(
-    tempQuery.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`),
-  );
-  let query = Tour.find(tempQuery);
-  ! 2) Sorting the data
-  if (req.query.sort) {
-    const sortBy = req.query.sort.split(',').join(' ');
-    console.log(sortBy);
-    query = query.sort(sortBy);
-  } else {
-    query.sort('-createdAt');
-  }
-  ! Limiting the data
-  if (req.query.fields) {
-    const fields = req.query.fields.split(',').join(' ');
-    query = query.select(fields);
-  } else {
-    query = query.select('-__v');
-  }
-  ! Pagination
-  if (req.query.page || req.query.limit) {
-    console.log('inside the pagination');
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 10;
-    const skip = (page - 1) * limit;
-    console.log('Page:', page);
-    console.log('Limit:', limit);
-    console.log('Skip:', skip);
-    query = query.skip(skip).limit(limit);
-    console.log(query);
-    const numTours = await Tour.countDocuments(tempQuery);
-    if (skip >= numTours) {
-      throw new Error("Sorry the data doesn't exists");
-    }
-}*/
-  const features = new APIFeature(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .page()
-    .limit();
-  const tours = await features.query;
-  res.status(200).json({
-    status: 'success',
-    length: tours.length,
-    data: {
-      tours,
-    },
-  });
-});
 
 const getTheBusyMonth = catchAsync(async (req, res) => {
   const year = req.params.year * 1;
@@ -132,10 +76,11 @@ const getTourStats = catchAsync(async (req, res, next) => {
 //     },
 //   });
 // });
-const getTour = factory.getOne(Tour, 'reviews');
+const getTour = factory.getOne(Tour, { path: 'reviews' }); //we don't have the select
 const createTour = factory.createOne(Tour);
 const updateTour = factory.updateOne(Tour);
 const deleteTour = factory.deleteOne(Tour);
+const getAllTours = factory.getAll(Tour);
 module.exports = {
   getAllTours,
   createTour,

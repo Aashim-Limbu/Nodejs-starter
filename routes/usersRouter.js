@@ -29,6 +29,10 @@ router
 router
   .route('/deleteMe')
   .delete(authController.control, userController.deleteMe);
+router.route('/').get(userController.getAllUsers);
+router
+  .route('/me')
+  .get(authController.control, userController.getMe, userController.getUser);
 router
   .route('/:id')
   .get(userController.getUser)

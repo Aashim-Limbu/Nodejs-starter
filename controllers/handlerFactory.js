@@ -1,4 +1,5 @@
 const AppError = require('../utils/appError');
+const APIFeature = require('../utils/APIFeaures');
 const catchAsync = require('../utils/catchAsync');
 
 exports.deleteOne = (Model) =>
@@ -45,12 +46,29 @@ exports.getOne = (Model, popOptions) =>
     if (popOptions) query = query.populate(popOptions);
     const doc = await query;
     if (!doc) {
-      return next(
-        new AppError(`No tour with ${req.params.id} was found `, 404),
-      );
+      return next(new AppError(`Sorry can't find ${req.params.id}  `, 404));
     }
     res.status(200).json({
       status: 'success',
+      data: {
+        data: doc,
+      },
+    });
+  });
+exports.getAll = (Model) =>
+  catchAsync(async (req, res) => {
+    //to allow for nested route for filter
+    let tempFilter = {};
+    if (req.params.tourId) tempFilter = { tour: req.params.tourId };
+    const features = new APIFeature(Model.find(tempFilter), req.query)
+      .filter()
+      .sort()
+      .limit()
+      .page();
+    const doc = await features.query;
+    res.status(200).json({
+      status: 'success',
+      results: doc.length,
       data: {
         data: doc,
       },

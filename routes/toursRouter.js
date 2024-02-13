@@ -21,5 +21,6 @@ router.route('/get-tour-stats').get(getTourStats);
 router.route('/').get(getAllTours).post(createTour);
 //!i guess this is for the admin and lead-guide only
 router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
+//! Advance express mounting the router
 router.use('/:tourId/reviews', reviewRouter);
 module.exports = router;
