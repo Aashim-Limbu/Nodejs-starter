@@ -18,28 +18,18 @@ router.route('/signup').post(authController.signUp);
 router.route('/signin').post(authController.signIn);
 router.route('/forgotPassword').post(authController.forgotPassword);
 router.route('/resetPassword/:resetToken').patch(authController.resetPassword);
-router
-  .route('/updateMyPassword')
-  .patch(authController.control, authController.updatePassword);
-router
-  .route('/updateMe')
-  .patch(authController.control, userController.updateMe);
-// router.param('index', checkUser);
-// .post(createUser);
-router
-  .route('/deleteMe')
-  .delete(authController.control, userController.deleteMe);
+
+router.use(authController.control);
+
+router.route('/updateMyPassword').patch(authController.updatePassword);
+router.route('/updateMe').patch(userController.updateMe);
+router.route('/deleteMe').delete(userController.deleteMe);
+router.route('/me').get(userController.getMe, userController.getUser);
+router.use(authController.restrictTo('admin'));
 router.route('/').get(userController.getAllUsers);
-router
-  .route('/me')
-  .get(authController.control, userController.getMe, userController.getUser);
 router
   .route('/:id')
   .get(userController.getUser)
-  .delete(
-    authController.control,
-    authController.restrictTo('admin', 'lead-guide'),
-    userController.deleteUser,
-  )
+  .delete(userController.deleteUser)
   .patch(userController.updateUser);
 module.exports = router;

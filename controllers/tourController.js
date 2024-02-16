@@ -3,6 +3,7 @@ const Tour = require('../models/tourModel');
 // const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 function setParameter(req, res, next) {
   req.query.limit = '5';
@@ -63,7 +64,68 @@ const getTourStats = catchAsync(async (req, res, next) => {
     },
   });
 });
+const getDistances = catchAsync(async (req, res, next) => {
+  const { latlong } = req.params;
+  const { queryParam } = req.query;
+  const [lat, long] = latlong.split(',');
+  if (!lat || !long) {
+    return next(new AppError('Please provide the location access', 400));
+  }
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [long * 1, parseFloat(lat * 1)],
+        },
+        distanceField: 'distance',
+        distanceMultiplier: 0.001,
+        query: { name: queryParam },
+      },
+    },
+    {
+      $project: { name: 1, distance: 1 },
+    },
+  ]);
+  res.status(200).json({
+    status: 'success',
+    length: distances.length,
+    data: {
+      data: distances,
+    },
+  });
+});
 
+const getAttractionWithIn = catchAsync(async (req, res, next) => {
+  const { latlong } = req.params;
+  let { maxDistance } = req.params;
+  console.log(latlong, maxDistance);
+  if (!latlong) {
+    return next(new AppError("Can't get your location", 400));
+  }
+  if (!maxDistance) {
+    maxDistance = 50;
+  }
+  const [lat, long] = latlong.split(',');
+  const attractions = await Tour.find({
+    startLocation: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates: [long * 1, lat * 1],
+        },
+        $maxDistance: maxDistance * 1000,
+      },
+    },
+  });
+  res.status(200).json({
+    status: 'Success',
+    length: attractions.length,
+    data: {
+      data: attractions,
+    },
+  });
+});
 // const getTour = catchAsync(async (req, res, next) => {
 //   const tour = await Tour.findById(req.params.id).populate('reviews');
 //   if (!tour) {
@@ -90,4 +152,6 @@ module.exports = {
   setParameter,
   getTourStats,
   getTheBusyMonth,
+  getAttractionWithIn,
+  getDistances,
 };
