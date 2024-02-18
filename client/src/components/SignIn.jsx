@@ -20,7 +20,7 @@ export default function SignIn() {
 			});
 			const { token } = response.data;
 			sessionStorage.setItem("token", token);
-			navigate("/dashboard");
+            navigate("/dashboard")
 		} catch (error) {
 			console.log("Error", error);
 		}

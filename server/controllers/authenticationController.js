@@ -14,6 +14,7 @@ function signToken(id) {
 function createSendToken(user, statusCode, res) {
   const token = signToken(user._id);
   const cookieOptions = {
+    httpOnly: false,
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
@@ -24,6 +25,7 @@ function createSendToken(user, statusCode, res) {
   res.status(statusCode).json({
     status: 'success',
     token,
+    role: user.role,
   });
 }
 exports.signUp = catchAsync(async (req, res) => {
@@ -168,7 +170,10 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   //     token,
   //   });
 });
-
+exports.signOut = (req, res) => {
+  res.clearCookie('jwt', { path: '/' });
+  res.status(200).send('LogOut Successfull');
+};
 exports.restrictTo =
   (...roles) =>
   (req, res, next) => {

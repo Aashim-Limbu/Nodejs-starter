@@ -1,5 +1,8 @@
+import SideBar from "./SideBar"
 function DashBoard() {
-  return <div>DashBoard</div>;
+  return <div>
+    <SideBar/>
+  </div>;
 }
 
 export default DashBoard;

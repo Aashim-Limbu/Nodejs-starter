@@ -2,6 +2,8 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const { xss } = require('express-xss-sanitizer');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const helmet = require('helmet');
 const toursRouter = require('./routes/toursRouter');
 const usersRouter = require('./routes/usersRouter');
@@ -10,6 +12,13 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
+const corsOptions = {
+  origin: 'http://localhost:5173',
+  methods: 'GET,POST,PUT,DELETE,PATCH',
+  credentials: true,
+};
+app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(helmet());
 const limitter = rateLimit({
   limit: 100,
