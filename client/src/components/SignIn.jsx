@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { apis } from "../utils/apis";
 import { FcGoogle } from "react-icons/fc";
+import ErrorPage from "./ErrorPage";
 
 export default function SignIn() {
 	const navigate = useNavigate();
@@ -18,24 +19,17 @@ export default function SignIn() {
 				email,
 				password,
 			});
-			const { token } = response.data;
+			const { token, role } = response.data;
 			sessionStorage.setItem("token", token);
-            navigate("/dashboard")
+			sessionStorage.setItem("auth", role);
+			navigate("/dashboard");
 		} catch (error) {
-			console.log("Error", error);
+			<ErrorPage />;
 		}
 	};
 
 	return (
 		<>
-			{/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-gray-50">
-        <body class="h-full">
-        ```
-      */}
 			<div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
 				<div className="sm:mx-auto sm:w-full sm:max-w-md">
 					<img
