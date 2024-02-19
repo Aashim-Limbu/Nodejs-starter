@@ -19,8 +19,10 @@ router.route('/signin').post(authController.signIn);
 router.route('/signOut').get(authController.signOut);
 router.route('/forgotPassword').post(authController.forgotPassword);
 router.route('/resetPassword/:resetToken').patch(authController.resetPassword);
-
 router.use(authController.control);
+router
+  .route('/getadmin')
+  .get(userController.setPramasAdmin, userController.getAllUsers);
 
 router.route('/updateMyPassword').patch(authController.updatePassword);
 router.route('/updateMe').patch(userController.updateMe);

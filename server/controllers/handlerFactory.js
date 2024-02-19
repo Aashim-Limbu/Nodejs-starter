@@ -43,7 +43,6 @@ exports.createOne = (Model) =>
 exports.getOne = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
     let query = Model.findById(req.params.id);
-    console.log('inside getOne', res.cookie.jwt);
     if (popOptions) query = query.populate(popOptions);
     const doc = await query;
     if (!doc) {
@@ -56,12 +55,14 @@ exports.getOne = (Model, popOptions) =>
       },
     });
   });
-exports.getAll = (Model) =>
+exports.getAll = (Model, popOptions) =>
   catchAsync(async (req, res) => {
     //to allow for nested route for filter
     let tempFilter = {};
     if (req.params.tourId) tempFilter = { tour: req.params.tourId };
-    const features = new APIFeature(Model.find(tempFilter), req.query)
+    let query = Model.find(tempFilter);
+    if (popOptions) query = query.populate(popOptions);
+    const features = new APIFeature(query, req.query)
       .filter()
       .sort()
       .limit()

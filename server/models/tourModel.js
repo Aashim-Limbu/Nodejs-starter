@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const Review = require('./reviewModel');
 const User = require('./userModel');
 
 const { Schema } = mongoose;
@@ -111,7 +110,7 @@ tourSchema.virtual('durationInWeeks').get(function () {
   return this.duration / 7;
 });
 tourSchema.virtual('reviews', {
-  ref: Review,
+  ref: 'Review',
   foreignField: 'tour',
   localField: '_id',
 });

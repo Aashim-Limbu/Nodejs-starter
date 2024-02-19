@@ -142,7 +142,7 @@ const getTour = factory.getOne(Tour, { path: 'reviews' }); //we don't have the s
 const createTour = factory.createOne(Tour);
 const updateTour = factory.updateOne(Tour);
 const deleteTour = factory.deleteOne(Tour);
-const getAllTours = factory.getAll(Tour);
+const getAllTours = factory.getAll(Tour, { path: 'reviews' });
 module.exports = {
   getAllTours,
   createTour,

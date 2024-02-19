@@ -56,6 +56,10 @@ exports.getMe = (req, res, next) => {
   req.params.id = req.user._id;
   next();
 };
+exports.setPramasAdmin = (req, res, next) => {
+  req.query.role = 'admin';
+  next();
+};
 exports.getUser = factory.getOne(User);
 exports.getAllUsers = factory.getAll(User);
 exports.deleteUser = factory.deleteOne(User);
