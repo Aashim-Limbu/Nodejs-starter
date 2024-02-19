@@ -1,6 +1,4 @@
-/** @type {import('tailwindcss').Config} */
-import aspectRatioPlugin from "@tailwindcss/aspect-ratio";
-import typographyPlugin from "@tailwindcss/typography";
+/*eslint-env node*/
 export default {
 	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 	theme: {
@@ -10,5 +8,9 @@ export default {
 			},
 		},
 	},
-	plugins: [aspectRatioPlugin, typographyPlugin],
+	plugins: [
+		require("@tailwindcss/aspect-ratio"),
+		require("@tailwindcss/forms"),
+		require("@tailwindcss/typography"),
+	],
 };

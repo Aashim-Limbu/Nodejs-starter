@@ -5,7 +5,6 @@ function Tours() {
 	console.log(tours.data.data);
 	return (
 		<div>
-			<div>Tours</div>
 			<ProductList products={tours.data.data} />
 		</div>
 	);

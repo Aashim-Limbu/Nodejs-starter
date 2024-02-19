@@ -8,6 +8,8 @@ import Test from "../components/Test.jsx";
 import { TourOverViewRoute } from "../components/TourOverView/TourOverViewRoute.jsx";
 import { UserListRoute } from "../components/Users/UserListRoute.jsx";
 import { TourRoute } from "../components/Tours/TourRoute.jsx";
+import { UserUpdateRoute } from "../components/Forms/UserUpdateRoutes.jsx";
+import { UserRoute } from "../components/Users/UserRoute.jsx";
 export const router = createBrowserRouter([
 	{ path: "/signin", element: <SignIn /> },
 	{
@@ -23,10 +25,33 @@ export const router = createBrowserRouter([
 					{ path: "home", element: <Stats /> },
 					{
 						path: "user",
-						...UserListRoute,
+						children: [
+							{ index: true, ...UserListRoute },
+							{ path: "new", element: <h1>New</h1> },
+							{
+								path: ":userId",
+								children: [
+									{ index: true, ...UserRoute },
+									{ path: "edit", ...UserUpdateRoute },
+								],
+							},
+						],
 					},
 					{ path: "test", element: <Test /> },
-					{ path: "tour", ...TourRoute },
+					{
+						path: "tour",
+						children: [
+							{ index: true, ...TourRoute },
+							{ path: "new", element: <h1>New Tour Form</h1> },
+							{
+								path: ":tourId",
+								children: [
+									{ index: true, ...TourOverViewRoute },
+									{ path: "edit", element: <h1>Edit Tour</h1> },
+								],
+							},
+						],
+					},
 					{ path: "tour/:tourId", ...TourOverViewRoute },
 				],
 			},

@@ -132,7 +132,8 @@ export default function TourOverView() {
 												</h3>
 												<p>
 													<time dateTime={review.createdAt}>
-														{review.createdAt}
+														{new Date(review.createdAt)
+															.toLocaleDateString()}
 													</time>
 												</p>
 
