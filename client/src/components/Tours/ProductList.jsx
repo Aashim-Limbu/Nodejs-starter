@@ -13,7 +13,6 @@
   ```
 */
 import { StarIcon } from "@heroicons/react/20/solid";
-import Tour from "../../assets/Tour1.png";
 import { Link } from "react-router-dom";
 // const products = [
 // 	{

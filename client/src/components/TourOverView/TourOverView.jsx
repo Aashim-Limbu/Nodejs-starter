@@ -128,7 +128,7 @@ export default function TourOverView() {
 												)}
 											>
 												<h3 className="font-medium text-gray-900">
-													{review.user.name}
+													{review.user?.name}
 												</h3>
 												<p>
 													<time dateTime={review.createdAt}>
