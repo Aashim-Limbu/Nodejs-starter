@@ -14,8 +14,14 @@ function signToken(id) {
 function createSendToken(user, statusCode, res) {
   const token = signToken(user._id);
   const cookieOptions = {
-    httpOnly: false,
-    expires: new Date(
+    httpOnly: false, // Cookie can be accessed by client-side JavaScript if set to true, but it's generally recommended to set it to true for security reasons.
+    /*!Strict: Cookies are only sent with same-site requests (i.e., requests to the same domain as the one that set the cookie). This is the most secure option but might limit functionality across different contexts.
+Lax: Cookies are sent with same-site requests and cross-site requests initiated through navigation (e.g., clicking a link). This offers a balance between security and usability.
+None: Cookies are sent with all requests, even cross-site ones initiated through non-navigation methods (e.g., form submissions). This provides the most flexibility but is the least secure and requires additional precautions.
+*/
+    sameSite: 'lax',
+    secure: false, // Set to true if your server is serving requests over HTTPS. This ensures that the cookie is only sent over secure connections.
+    expires: new Date( // Specifies the expiration date for the cookie. Adjust the expiration time based on your requirements.
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
   };
@@ -74,6 +80,8 @@ exports.control = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if (!token) {
     return next(new AppError('Access Denied! Login to continue !', 401));
@@ -171,8 +179,11 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   //   });
 });
 exports.signOut = (req, res) => {
-  res.clearCookie('jwt', { path: '/' });
-  res.status(200).send('LogOut Successfull');
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
 };
 exports.restrictTo =
   (...roles) =>

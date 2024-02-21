@@ -16,9 +16,9 @@ export default function User() {
 				</div>
 				<div className="aspect-h-3 aspect-w-4 overflow-hidden rounded-lg bg-gray-100">
 					<img
-						src={user.photo}
+						src={user.imageUrl}
 						alt={user.name}
-						className="object-cover object-center"
+						className="object-contain object-center"
 					/>
 				</div>
 			</div>
@@ -40,15 +40,7 @@ export default function User() {
 							{user.email}
 						</dd>
 					</div>
-					<div className="bg-gray-50 px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
-						<dt className="text-sm font-medium leading-6 text-gray-900">
-							Email address
-						</dt>
-						<dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-							{user.email}
-						</dd>
-					</div>
-					<div className="bg-white px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+					<div className="bg-gray-50  px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
 						<dt className="text-sm font-medium leading-6 text-gray-900">
 							Role
 						</dt>
@@ -56,7 +48,7 @@ export default function User() {
 							{user.role}
 						</dd>
 					</div>
-					<div className="bg-gray-50 px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
+					<div className="bg-white px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-3">
 						<dt className="text-sm font-medium leading-6 text-gray-900">
 							Active
 						</dt>

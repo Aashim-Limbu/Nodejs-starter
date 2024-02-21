@@ -1,4 +1,4 @@
-import {  Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 export default function ProtectRoute() {
@@ -6,7 +6,7 @@ export default function ProtectRoute() {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		const auth = sessionStorage.getItem("token");
+		const auth = sessionStorage.getItem("auth");
 		if (!auth) {
 			navigate("/signin");
 		}

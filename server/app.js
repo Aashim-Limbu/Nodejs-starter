@@ -18,7 +18,7 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-app.use(cookieParser());
+app.use(express.static('public'));
 app.use(helmet());
 const limitter = rateLimit({
   limit: 100,
@@ -27,9 +27,14 @@ const limitter = rateLimit({
     'Error Occured !! Too Many request please trying again in next hours',
 });
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 app.use('/api', limitter);
 app.use(mongoSanitize());
 app.use(xss());
+// app.use((req, res, next) => {
+//   console.log(req.cookies);
+//   next();
+// });
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/tours', toursRouter);
 app.use('/api/v1/reviews', reviewsRouter);

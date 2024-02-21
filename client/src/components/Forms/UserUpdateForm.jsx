@@ -1,14 +1,39 @@
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-import { Form, useParams, useLoaderData } from "react-router-dom";
-import { useRef } from "react";
+import { redirect, useLoaderData, useNavigate } from "react-router-dom";
+import { useRef, useState } from "react";
+import { apis } from "../../utils/apis";
 export default function UserUpdateForm() {
 	const inputRef = useRef(null);
-	const { userId } = useParams();
+	const navigate = useNavigate();
+	// const { userId } = useParams();
 	const { user } = useLoaderData();
+	const [name, setName] = useState(user?.name);
+	const [email, setEmail] = useState(user?.email);
+	const [role, setRole] = useState(user?.role);
+	const [image, setImage] = useState(user?.photo);
+	console.log(image);
+	async function handleSubmit(e) {
+		e.preventDefault();
+		const formData = new FormData();
+		formData.append("name", name);
+		formData.append("email", email);
+		formData.append("role", role);
+		formData.append("photo", image);
+		try {
+			await apis.patch(`/users/updateMe`, formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
+			return navigate(-2);
+		} catch (error) {
+			console.error("Error updating user:", error);
+		}
+	}
 
 	return (
 		// <Form method="patch" action={`/users/${userId}`}>
-		<Form method="patch">
+		<form method="patch" onSubmit={handleSubmit}>
 			<div className="space-y-12">
 				<div className="border-b border-gray-900/10 pb-12">
 					<h2 className="text-base font-semibold leading-7 text-gray-900">
@@ -31,7 +56,8 @@ export default function UserUpdateForm() {
 									type="text"
 									name="name"
 									id="name"
-									defaultValue={user.name}
+									value={name}
+									onChange={(e) => setName(e.target.value)}
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 								/>
 							</div>
@@ -48,7 +74,8 @@ export default function UserUpdateForm() {
 									id="email"
 									name="email"
 									type="email"
-									defaultValue={user.email}
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 								/>
 							</div>
@@ -70,6 +97,7 @@ export default function UserUpdateForm() {
 									className="hidden"
 									type="file"
 									id="photo"
+									onChange={(e) => setImage(e.target.files[0])}
 									name="photo"
 									accept="image/*"
 								/>
@@ -95,7 +123,8 @@ export default function UserUpdateForm() {
 									id="role"
 									name="role"
 									autoComplete="country-name"
-									defaultValue={user.role}
+									value={role}
+									onChange={(e) => setRole(e.target.value)}
 									className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
 								>
 									<option value="admin">Admin</option>
@@ -112,9 +141,11 @@ export default function UserUpdateForm() {
 				<button
 					type="button"
 					className="text-sm font-semibold leading-6 text-gray-900"
+					onClick={() => navigate(-2)}
 				>
 					Cancel
 				</button>
+
 				<button
 					type="submit"
 					className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
@@ -122,6 +153,6 @@ export default function UserUpdateForm() {
 					Save
 				</button>
 			</div>
-		</Form>
+		</form>
 	);
 }

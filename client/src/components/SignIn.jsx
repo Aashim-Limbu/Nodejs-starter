@@ -19,8 +19,9 @@ export default function SignIn() {
 				email,
 				password,
 			});
-			const { token, role } = response.data;
-			sessionStorage.setItem("token", token);
+			// const { role, token } = response.data;
+			const { role } = response.data;
+			// sessionStorage.setItem("token", token);
 			sessionStorage.setItem("auth", role);
 			navigate("/dashboard");
 		} catch (error) {

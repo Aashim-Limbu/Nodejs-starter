@@ -62,7 +62,7 @@ export default function UserList() {
 												<div className="h-11 w-11 flex-shrink-0">
 													<img
 														className="h-11 w-11 rounded-full"
-														src={person.photo}
+														src={person.imageUrl}
 														alt=""
 													/>
 												</div>
