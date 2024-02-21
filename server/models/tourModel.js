@@ -109,6 +109,9 @@ tourSchema.index({ startLocation: '2dsphere' });
 tourSchema.virtual('durationInWeeks').get(function () {
   return this.duration / 7;
 });
+tourSchema.virtual('imagesUrl').get(function () {
+  return this.images.map((image) => `http://localhost:8001/img/tours/${image}`);
+});
 tourSchema.virtual('reviews', {
   ref: 'Review',
   foreignField: 'tour',

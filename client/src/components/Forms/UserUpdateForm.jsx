@@ -1,11 +1,12 @@
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-import { redirect, useLoaderData, useNavigate } from "react-router-dom";
+import { useParams, useLoaderData, useNavigate } from "react-router-dom";
 import { useRef, useState } from "react";
 import { apis } from "../../utils/apis";
 export default function UserUpdateForm() {
 	const inputRef = useRef(null);
 	const navigate = useNavigate();
-	// const { userId } = useParams();
+	const { userId } = useParams();
+	console.log(userId);
 	const { user } = useLoaderData();
 	const [name, setName] = useState(user?.name);
 	const [email, setEmail] = useState(user?.email);
@@ -20,7 +21,7 @@ export default function UserUpdateForm() {
 		formData.append("role", role);
 		formData.append("photo", image);
 		try {
-			await apis.patch(`/users/updateMe`, formData, {
+			await apis.patch(`/users/${userId}`, formData, {
 				headers: {
 					"Content-Type": "multipart/form-data",
 				},

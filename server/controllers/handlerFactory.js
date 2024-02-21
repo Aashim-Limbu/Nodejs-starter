@@ -15,6 +15,7 @@ exports.deleteOne = (Model) =>
 exports.updateOne = (Model) =>
   catchAsync(async (req, res, next) => {
     if (req.file) req.body.photo = req.file.filename;
+    console.log(req.file);
     const docs = await Model.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,

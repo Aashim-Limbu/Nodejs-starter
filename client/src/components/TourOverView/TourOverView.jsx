@@ -17,7 +17,7 @@ export default function TourOverView() {
 					<div className="lg:col-span-4 lg:row-end-1">
 						<div className="aspect-h-3 aspect-w-4 overflow-hidden rounded-lg bg-gray-100">
 							<img
-								src={product.images[0]}
+								src={product.imagesUrl[0]}
 								alt={product.name}
 								className="object-cover object-center"
 							/>

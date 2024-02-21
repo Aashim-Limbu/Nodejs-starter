@@ -81,7 +81,7 @@ export default function ProductList({ products }) {
 						>
 							<div className="aspect-h-1 aspect-w-1 overflow-hidden rounded-lg bg-gray-200 group-hover:opacity-75">
 								<img
-									src={Tour}
+									src={product.imagesUrl[0]}
 									alt={product.name}
 									className="h-full w-full object-cover object-center"
 								/>
