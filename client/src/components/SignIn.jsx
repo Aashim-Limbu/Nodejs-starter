@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apis } from "../utils/apis";
 import { FcGoogle } from "react-icons/fc";
 import ErrorPage from "./ErrorPage";
-
+import Logo from "../assets/Travel.svg";
 export default function SignIn() {
 	const navigate = useNavigate();
 	const emailRef = useRef(null);
@@ -23,7 +23,7 @@ export default function SignIn() {
 			const { role } = response.data;
 			// sessionStorage.setItem("token", token);
 			sessionStorage.setItem("auth", role);
-			navigate("/dashboard");
+			navigate("/dashboard", { replace: true });
 		} catch (error) {
 			<ErrorPage />;
 		}
@@ -33,11 +33,10 @@ export default function SignIn() {
 		<>
 			<div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
 				<div className="sm:mx-auto sm:w-full sm:max-w-md">
-					<img
-						className="mx-auto h-10 w-auto"
-						src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-						alt="Your Company"
-					/>
+					<div className="flex justify-center">
+						<img src={Logo} alt="logo" width={"80px"} />
+					</div>
+
 					<h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
 						Sign in to your account
 					</h2>
