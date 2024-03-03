@@ -1,0 +1,29 @@
+[
+    {
+  "name": "Pashupatinath Temple Tour",
+  "secretTour": false,
+  "slug": "pashupatinath-temple-tour",
+  "ratingsAverage": 4.5,
+  "ratingQuantity": 0,
+  "description": "Explore the ancient and sacred Pashupatinath Temple dedicated to Lord Shiva.",
+  "imageCover": "pashupatinath.jpg",
+  "images": ["image1.jpg", "image2.jpg", "image3.jpg"],
+  "startLocation": {
+    "type": "Point",
+    "coordinates": [85.3486, 27.7109],
+    "address": "Pashupatinath Temple, Kathmandu, Nepal",
+    "description": "Starting point of the tour at Pashupatinath Temple."
+  },
+  "guides": ["5c8a1f292f8fb814b56fa184"],
+  "locations": [
+    {
+      "type": "Point",
+      "coordinates": [85.3486, 27.7109],
+      "address": "Pashupatinath Temple, Kathmandu, Nepal",
+      "description": "One of the most significant Hindu temples dedicated to Lord Shiva.",
+      "day": 1
+    }
+  ]
+}
+
+]

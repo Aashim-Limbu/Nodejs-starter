@@ -10,6 +10,7 @@ import { UserListRoute } from "../components/Users/UserListRoute.jsx";
 import { TourRoute } from "../components/Tours/TourRoute.jsx";
 import { UserUpdateRoute } from "../components/Forms/UserUpdateRoutes.jsx";
 import { UserRoute } from "../components/Users/UserRoute.jsx";
+import { TourFormRoute } from "../components/Forms/TourForm.jsx";
 export const router = createBrowserRouter([
 	{ path: "/signin", element: <SignIn /> },
 	{
@@ -42,7 +43,7 @@ export const router = createBrowserRouter([
 						path: "tour",
 						children: [
 							{ index: true, ...TourRoute },
-							{ path: "new", element: <h1>New Tour Form</h1> },
+							{ path: "new", ...TourFormRoute },
 							{
 								path: ":tourId",
 								children: [

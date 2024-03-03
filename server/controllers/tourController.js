@@ -1,3 +1,4 @@
+const multer = require('multer');
 const Tour = require('../models/tourModel');
 // const APIFeature = require('../utils/APIFeaures');
 // const AppError = require('../utils/appError');
@@ -11,7 +12,28 @@ function setParameter(req, res, next) {
   req.query.fields = 'name,price,ratingsAverage,summary,maxGroupSize';
   next();
 }
-
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/tours');
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `tour-${req.user}-${Date.now()}.${ext}`);
+  },
+});
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an Image Please upload image', 400), false);
+  }
+};
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+// exports.uploadTourPhoto = upload.single('photos');
+// exports.uploadTourCoverPhoto = upload.single('coverPhoto');
 const getTheBusyMonth = catchAsync(async (req, res) => {
   const year = req.params.year * 1;
   const data = await Tour.aggregate([

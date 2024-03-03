@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const User = require('./userModel');
 
 const { Schema } = mongoose;
 const tourSchema = new Schema(
@@ -8,8 +7,8 @@ const tourSchema = new Schema(
     name: {
       type: String,
       required: [true, 'Tour must have Name'],
-      maxlength: [20, 'Name must be less than or equal 20 characters'],
-      minlength: [3, 'Name must be greater than or equal 3 charatcters'],
+      maxlength: [50, 'Name must be less than or equal 20 characters'],
+      minlength: [3, 'Name must be greater than or equal 3 characters'],
       unique: true,
       trim: true,
     },
@@ -18,41 +17,19 @@ const tourSchema = new Schema(
       default: false,
     },
     slug: String,
-    price: {
-      type: Number,
-      required: [true, 'Tour must have Price'],
-    },
     ratingsAverage: {
       type: Number,
-      default: 4.5,
-      min: [1, 'Ratings must be greater than or equal to 1'],
-      max: [5, 'Ratings must be lesser then or equal to 5'],
+      default: 0,
+      max: [5, 'Ratings must be lesser than or equal to 5'],
     },
     ratingQuantity: {
       type: Number,
       default: 0,
     },
-    duration: {
-      type: Number,
-      required: [true, 'A tour must have duration'],
-    },
-    maxGroupSize: {
-      type: Number,
-      required: [true, 'A tour must have the group size'],
-    },
     summary: {
       type: String,
       trim: true,
     },
-    difficulty: {
-      type: String,
-      required: [true, 'A tour must have the difficulty'],
-      enum: {
-        values: ['difficult', 'easy', 'medium'],
-        message: '{VALUE} is not a valid difficulty level!',
-      },
-    },
-    priceDiscount: Number,
     description: {
       type: String,
       trim: true,
@@ -67,7 +44,6 @@ const tourSchema = new Schema(
       type: Date,
       default: Date.now(),
     },
-    startDates: [Date],
     startLocation: {
       type: {
         type: String,
@@ -81,7 +57,7 @@ const tourSchema = new Schema(
     guides: [
       {
         type: Schema.Types.ObjectId,
-        ref: User,
+        ref: 'User',
       },
     ],
     locations: [
@@ -94,7 +70,6 @@ const tourSchema = new Schema(
         coordinates: [Number],
         address: String,
         description: String,
-        day: Number,
       },
     ],
   },
@@ -103,7 +78,8 @@ const tourSchema = new Schema(
     toObject: { virtuals: true },
   },
 );
-tourSchema.index({ price: 1, ratingsAverage: -1 });
+
+tourSchema.index({ ratingQuantity: -1, ratingsAverage: -1 });
 tourSchema.index({ startLocation: '2dsphere' });
 
 tourSchema.virtual('durationInWeeks').get(function () {
