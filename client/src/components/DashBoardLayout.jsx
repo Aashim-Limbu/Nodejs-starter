@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
 	Bars3Icon,
@@ -9,14 +9,16 @@ import {
 	UsersIcon,
 	XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { ToastContainer } from "react-toastify";
+import Logo from "../assets/Travel.svg";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { NavLink } from "react-router-dom";
 
 const navigation = [
 	{ name: "Dashboard", href: "home", icon: HomeIcon },
-	{ name: "Users", href: "user", icon: UsersIcon },
-	{ name: "Tours", href: "tour", icon: UsersIcon },
-	{ name: "Test", href: "test", icon: UsersIcon },
+	{ name: "Users", href: "users", icon: UsersIcon },
+	{ name: "Tours", href: "tours", icon: UsersIcon },
+	{ name: "Test", href: "tests", icon: UsersIcon },
 ];
 const teams = [
 	{ id: 1, name: "Aashim Limbu", href: "#" },
@@ -33,8 +35,8 @@ function classNames(...classes) {
 }
 
 export default function NavBarLayout() {
+	const location = useLocation();
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-
 	return (
 		<>
 			<div>
@@ -186,12 +188,14 @@ export default function NavBarLayout() {
 				<div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
 					{/* Sidebar component, swap this element with another sidebar if you like */}
 					<div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4">
-						<div className="flex h-16 shrink-0 items-center">
-							<img
-								className="h-8 w-auto"
-								src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-								alt="Your Company"
-							/>
+						{/* <div className="flex h-16 shrink-0 items-center">
+							<img className="h-8 w-auto" src={Logo} alt="Your Company" />
+						</div> */}
+						<div className="font-bold text-xl flex items-center ">
+							<div className="flex h-20 shrink-0 items-center">
+								<img className="h-14 w-auto" src={Logo} alt="Your Company" />
+							</div>
+							<span>MeroGuide</span>
 						</div>
 						<nav className="flex flex-1 flex-col">
 							<ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -292,7 +296,11 @@ export default function NavBarLayout() {
 
 						<div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
 							<div className="font-bold text-xl flex flex-1 items-center ">
-								DashBoard
+								<span className="capitalize">
+									{location.pathname.split("/")[2] === "home"
+										? "dashboard"
+										: location.pathname.split("/")[2]}
+								</span>
 							</div>
 							<div className="flex items-center gap-x-4 lg:gap-x-6">
 								<button
@@ -366,6 +374,7 @@ export default function NavBarLayout() {
 					<main className="py-10">
 						<div className="px-4 sm:px-6 lg:px-8">
 							<Outlet />
+							<ToastContainer />
 						</div>
 					</main>
 				</div>

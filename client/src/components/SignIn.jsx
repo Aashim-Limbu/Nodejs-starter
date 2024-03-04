@@ -4,11 +4,11 @@ import { apis } from "../utils/apis";
 import { FcGoogle } from "react-icons/fc";
 import ErrorPage from "./ErrorPage";
 import Logo from "../assets/Travel.svg";
+import { toast, Bounce } from "react-toastify";
 export default function SignIn() {
 	const navigate = useNavigate();
 	const emailRef = useRef(null);
 	const passwordRef = useRef(null);
-
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		const email = emailRef.current.value;
@@ -24,6 +24,17 @@ export default function SignIn() {
 			// sessionStorage.setItem("token", token);
 			sessionStorage.setItem("auth", role);
 			navigate("/dashboard", { replace: true });
+			toast.success("Login Successfull !!", {
+				position: "bottom-right",
+				autoClose: 2000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "light",
+				transition: Bounce,
+			});
 		} catch (error) {
 			<ErrorPage />;
 		}

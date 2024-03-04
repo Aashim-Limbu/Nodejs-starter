@@ -85,6 +85,22 @@ exports.createUser = (req, res) => {
     message: `The route is not defined ${req.originalUrl}`,
   });
 };
+exports.getUserStats = catchAsync(async (req, res, next) => {
+  const stats = await User.aggregate([
+    {
+      $group: {
+        _id: null,
+        noOfUser: { $sum: 1 },
+      },
+    },
+  ]);
+  res.status(200).json({
+    status: 'success',
+    data: {
+      stats,
+    },
+  });
+});
 exports.getMe = (req, res, next) => {
   req.params.id = req.user._id;
   next();
