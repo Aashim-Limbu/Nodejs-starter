@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import ErrorPage from "../components/ErrorPage.jsx";
 import ProtectRoute from "../components//ProtectRoute.jsx";
 import SignIn from "../components/SignIn.jsx";
-import DashBoardLayout from "../components/DashBoardLayout.jsx";
+import { DashboardLayoutRoute } from "../components/DashBoardLayout.jsx";
 import { StatsRoute } from "../components/Stats.jsx";
 import Test from "../components/Test.jsx";
 import { TourOverViewRoute } from "../components/TourOverView/TourOverViewRoute.jsx";
@@ -11,9 +11,11 @@ import { TourRoute } from "../components/Tours/TourRoute.jsx";
 import { UserUpdateRoute } from "../components/Forms/UserUpdateRoutes.jsx";
 import { UserRoute } from "../components/Users/UserRoute.jsx";
 import { TourFormRoute } from "../components/Forms/TourForm.jsx";
+import SignOut from "../components/SignOut.jsx";
 export const router = createBrowserRouter([
 	{ path: "/", element: <Navigate to="signIn" /> },
 	{ path: "/signin", element: <SignIn /> },
+	{ path: "/signout", element: <SignOut /> },
 	{
 		path: "/",
 		element: <ProtectRoute />,
@@ -21,7 +23,7 @@ export const router = createBrowserRouter([
 		children: [
 			{
 				path: "dashboard",
-				element: <DashBoardLayout />,
+				...DashboardLayoutRoute,
 				children: [
 					{ index: true, element: <Navigate to="home" /> },
 					{ path: "home", ...StatsRoute },

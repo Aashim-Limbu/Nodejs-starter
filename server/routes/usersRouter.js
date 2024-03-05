@@ -16,7 +16,7 @@ const router = express.Router();
 // since a router is specified to a particular  Router so the router.param is bound with the userRouter
 router.route('/signup').post(authController.signUp);
 router.route('/signin').post(authController.signIn);
-router.route('/signOut').get(authController.signOut);
+router.route('/signout').get(authController.signOut);
 router.route('/get-users-stats').get(userController.getUserStats);
 router.route('/forgotPassword').post(authController.forgotPassword);
 router.route('/resetPassword/:resetToken').patch(authController.resetPassword);

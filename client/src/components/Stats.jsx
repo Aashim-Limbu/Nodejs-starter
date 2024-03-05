@@ -9,8 +9,6 @@ import tokenRequest from "../utils/tokenGetRequest";
 // }
 function Stats() {
 	const { users, tours } = useLoaderData();
-	console.log(users.data.stats[0].noOfUser);
-	// console.log(tours.data.stats[0].noOfTour);
 	const stats = [
 		{
 			id: 1,

@@ -1,18 +1,23 @@
 import { Fragment, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import {
+	Outlet,
+	useLocation,
+	useLoaderData,
+	Link,
+} from "react-router-dom";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
 	Bars3Icon,
-	BellIcon,
 	Cog6ToothIcon,
 	HomeIcon,
 	UsersIcon,
 	XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { ToastContainer } from "react-toastify";
+
 import Logo from "../assets/Travel.svg";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { NavLink } from "react-router-dom";
+import tokenRequest from "../utils/tokenGetRequest";
 
 const navigation = [
 	{ name: "Dashboard", href: "home", icon: HomeIcon },
@@ -36,6 +41,8 @@ function classNames(...classes) {
 
 export default function NavBarLayout() {
 	const location = useLocation();
+	const { user } = useLoaderData();
+	console.log(user);
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 	return (
 		<>
@@ -107,8 +114,8 @@ export default function NavBarLayout() {
 													<ul role="list" className="-mx-2 space-y-1">
 														{navigation.map((item) => (
 															<li key={item.name}>
-																<a
-																	href={item.href}
+																<Link
+																	to={item.href}
 																	className={classNames(
 																		item.current
 																			? "bg-gray-50 text-indigo-600"
@@ -126,7 +133,7 @@ export default function NavBarLayout() {
 																		aria-hidden="true"
 																	/>
 																	{item.name}
-																</a>
+																</Link>
 															</li>
 														))}
 													</ul>
@@ -303,14 +310,6 @@ export default function NavBarLayout() {
 								</span>
 							</div>
 							<div className="flex items-center gap-x-4 lg:gap-x-6">
-								<button
-									type="button"
-									className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500"
-								>
-									<span className="sr-only">View notifications</span>
-									<BellIcon className="h-6 w-6" aria-hidden="true" />
-								</button>
-
 								{/* Separator */}
 								<div
 									className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200"
@@ -323,7 +322,7 @@ export default function NavBarLayout() {
 										<span className="sr-only">Open user menu</span>
 										<img
 											className="h-8 w-8 rounded-full bg-gray-50"
-											src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+											src={user.data.imageUrl}
 											alt=""
 										/>
 										<span className="hidden lg:flex lg:items-center">
@@ -331,7 +330,7 @@ export default function NavBarLayout() {
 												className="ml-4 text-sm font-semibold leading-6 text-gray-900"
 												aria-hidden="true"
 											>
-												Tom Cook
+												{user.data.name}
 											</span>
 											<ChevronDownIcon
 												className="ml-2 h-5 w-5 text-gray-400"
@@ -374,7 +373,6 @@ export default function NavBarLayout() {
 					<main className="py-10">
 						<div className="px-4 sm:px-6 lg:px-8">
 							<Outlet />
-							<ToastContainer />
 						</div>
 					</main>
 				</div>
@@ -382,3 +380,15 @@ export default function NavBarLayout() {
 		</>
 	);
 }
+async function loader() {
+	const {
+		data: { data: user },
+	} = await tokenRequest("/users/me");
+	return {
+		user,
+	};
+}
+export const DashboardLayoutRoute = {
+	element: <NavBarLayout />,
+	loader,
+};
