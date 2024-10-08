@@ -13,6 +13,8 @@ const {
   getTheBusyMonth,
   getAttractionWithIn,
   getDistances,
+  resizeTourImages,
+  uploadTourImage,
 } = require('../controllers/tourController');
 
 const router = express.Router();
@@ -39,13 +41,15 @@ router
     authController.restrictTo('admin', 'lead-guide'),
     createTour,
   );
-//!i guess this is for the admin and lead-guide only
+
 router
   .route('/:id')
   .get(getTour)
   .patch(
     authController.control,
     authController.restrictTo('admin', 'lead-guide'),
+    uploadTourImage,
+    resizeTourImages,
     updateTour,
   )
   .delete(
@@ -53,6 +57,6 @@ router
     authController.restrictTo('admin', 'lead-guide'),
     deleteTour,
   );
-//! Advance express mounting the router
+//mounting reviews on top of tourRouter
 router.use('/:tourId/reviews', reviewRouter);
 module.exports = router;

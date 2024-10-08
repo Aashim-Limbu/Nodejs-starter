@@ -1,5 +1,3 @@
-// const fs = require('fs');
-// const { v4 } = require('uuid');
 const multer = require('multer');
 const sharp = require('sharp');
 const User = require('../models/userModel');

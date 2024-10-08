@@ -1,3 +1,5 @@
+const sharp = require('sharp');
+const multer = require('multer');
 const Tour = require('../models/tourModel');
 // const APIFeature = require('../utils/APIFeaures');
 // const AppError = require('../utils/appError');
@@ -5,6 +7,51 @@ const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
+//^ multer config
+const multerStorage = multer.memoryStorage();
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Invalid Image Format.', 400), false);
+  }
+};
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+const uploadTourImage = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 5 },
+]);
+const resizeTourImages = async (req, res, next) => {
+  if (!req.files.imageCover || !req.files.images) return next();
+  try {
+    const imgcoverName = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+    console.log(imgcoverName);
+    await sharp(req.files.imageCover[0].buffer)
+      .resize(2000, 1333)
+      .toFormat('jpeg', { mozjpeg: true })
+      .toFile(`public/img/tours/${imgcoverName}`);
+    req.body.imageCover = imgcoverName;
+    const requestBody = [];
+    await Promise.all(
+      req.files.images.map(async (file, index) => {
+        const imgName = `tour-${req.params.id}-${Date.now()}-${index}.jpeg`;
+        await sharp(file.buffer)
+          .resize(2000, 1333)
+          .toFormat('jpeg', { mozjpeg: true })
+          .toFile(`public/img/tours/${imgName}`);
+        requestBody.push(imgName);
+      }),
+    );
+    req.body.images = requestBody;
+    console.log('Resized Successfully');
+    next();
+  } catch (error) {
+    console.log(error);
+  }
+};
 function setParameter(req, res, next) {
   req.query.limit = '5';
   req.query.sort = '-ratingsAverage,price';
@@ -99,7 +146,6 @@ const getDistances = catchAsync(async (req, res, next) => {
 const getAttractionWithIn = catchAsync(async (req, res, next) => {
   const { latlong } = req.params;
   let { maxDistance } = req.params;
-  console.log(latlong, maxDistance);
   if (!latlong) {
     return next(new AppError("Can't get your location", 400));
   }
@@ -154,4 +200,6 @@ module.exports = {
   getTheBusyMonth,
   getAttractionWithIn,
   getDistances,
+  uploadTourImage,
+  resizeTourImages,
 };
