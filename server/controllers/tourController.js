@@ -28,7 +28,6 @@ const resizeTourImages = async (req, res, next) => {
   if (!req.files.imageCover || !req.files.images) return next();
   try {
     const imgcoverName = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
-    console.log(imgcoverName);
     await sharp(req.files.imageCover[0].buffer)
       .resize(2000, 1333)
       .toFormat('jpeg', { mozjpeg: true })

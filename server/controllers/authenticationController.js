@@ -4,7 +4,8 @@ const crypto = require('crypto');
 const AppError = require('../utils/appError');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
-const { sendEmail } = require('../utils/email');
+const Email = require('../utils/email');
+const generateEmailTemplate = require('../utils/message-template');
 
 function signToken(id) {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -45,7 +46,16 @@ exports.signUp = catchAsync(async (req, res) => {
     role,
     passwordChangedAt,
   });
+  const Mail = new Email(user, 'http://localhost:3000/home');
+  try {
+    await Mail.sendWelcomeMessage();
+    console.log('mail sent success');
+  } catch (error) {
+    console.log('mail sent unsuccess');
+    console.log('error', error);
+  }
   createSendToken(user, 201, res);
+  console.log('Sending Welcome Message check for logs for production');
   //   const token = signToken(user._id);
   //   res.status(201).json({
   //     status: 'success',
@@ -97,9 +107,6 @@ exports.control = catchAsync(async (req, res, next) => {
   next();
 });
 exports.forgotPassword = catchAsync(async (req, res, next) => {
-  //!1)GET USER based on the posted Email
-  //!2) Generate random reset token
-  //!3)Send it to User's email
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
@@ -111,13 +118,14 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     'host',
   )}/api/v1/users/${resetToken}`;
   const message = `Forgot Password ? Submit new Password to ${resetURL} . If you don't want to forgot password Ignore! `;
+  const Mail = new Email(user);
   //~ Sending mail
   try {
-    await sendEmail({
-      email: user.email,
-      subject: 'Your password Reset Token',
+    await Mail.sendEmail(
+      'Your password Reset Token',
       message,
-    });
+      generateEmailTemplate(user.name, resetURL),
+    );
   } catch (error) {
     user.passwodResetTokenExpires = undefined;
     user.passwordResetToken = undefined;
@@ -143,6 +151,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     passwordResetToken: hashedResetToken,
     passwodResetTokenExpires: { $gte: Date.now() },
   });
+  console.log(user);
   if (!user) {
     next(
       new AppError(
