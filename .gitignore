@@ -1,1 +1,9 @@
-node_modules
+# Ignore node_modules directories
+/server/node_modules/
+/client/.vite/*
+# Ignore public directories
+/server/public/
+/client/public/
+
+# Ignore environment configuration file
+/server/config.env
