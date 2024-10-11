@@ -8,6 +8,7 @@ const helmet = require('helmet');
 const toursRouter = require('./routes/toursRouter');
 const usersRouter = require('./routes/usersRouter');
 const reviewsRouter = require('./routes/reviewsRouter');
+const bookingRouter = require('./routes/bookingsRouter');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -38,6 +39,7 @@ app.use(xss());
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/tours', toursRouter);
 app.use('/api/v1/reviews', reviewsRouter);
+app.use('/api/v1/bookings', bookingRouter);
 app.all('*', (req, res, next) => {
   next(new AppError(`No ${req.originalUrl} route have been defined`, 404));
 });
