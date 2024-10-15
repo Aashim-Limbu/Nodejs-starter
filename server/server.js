@@ -35,4 +35,10 @@ process.on('unhandledRejection', (err) => {
     //server.close is used to prevent server to stop running at an instant
     process.exit(1);
   });
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM SIGNAL Recieved');
+    server.close(() => {
+      console.log('Terminated Process');
+    });
+  });
 });

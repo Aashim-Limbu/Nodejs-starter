@@ -45,10 +45,9 @@ const resizeTourImages = async (req, res, next) => {
       }),
     );
     req.body.images = requestBody;
-    console.log('Resized Successfully');
     next();
   } catch (error) {
-    console.log(error);
+    next(error, 400);
   }
 };
 function setParameter(req, res, next) {

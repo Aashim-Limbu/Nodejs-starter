@@ -45,7 +45,6 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
       },
     },
   ]);
-  console.log('stats', stats);
   if (stats.length > 0) {
     await Tour.findByIdAndUpdate(tourId, {
       ratingsAverage: stats[0].avgRatings,
@@ -57,7 +56,6 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
       ratingQuantity: 0,
     });
   }
-  console.log(stats);
 };
 reviewSchema.index({ user: 1, tour: 1 }, { unique: true });
 reviewSchema.post('save', function () {
@@ -80,7 +78,6 @@ reviewSchema.pre(/^find/, function (next) {
 reviewSchema.pre(/^findOneAnd/, async function (next) {
   const doc = await this.model.findOne(this.getQuery()); //since this is query to get the model we use .model to access the schema model
   this.temp = doc;
-  console.log('this.temp.tour', this.temp.tour);
   next();
   //   const { tour } = await this.model.findOne(); //since this is query to get the model we use .model to access the schema model
   //   console.log('inside pre middleware');

@@ -33,7 +33,6 @@ function handleDuplicateFieldsDB(err) {
   return new AppError(message, 400);
 }
 function handleValidationErrorDB(err) {
-  console.log('Validation Error of the database 💿');
   const errors = Object.values(err.errors).map((e) => e.message);
   const message = `Validator Error occured : ${errors.join('.')}`;
   return new AppError(message, 400);

@@ -14,13 +14,11 @@ class Email {
 
   createTransport() {
     if (process.env.NODE_ENV === 'production') {
-      console.log('hello from production');
       const options = {
         auth: {
           api_key: process.env.SEND_GRID_PASSWORD,
         },
       };
-      console.log(options);
       return nodemailer.createTransport(sgTransport(options));
     }
     return nodemailer.createTransport({
@@ -35,8 +33,6 @@ class Email {
   }
 
   async sendEmail(subject, message, html = '<p>Hi from Aashim </p>') {
-    console.log(this.from);
-    console.log('email', this.user.email);
     return await this.createTransport().sendMail({
       from: this.from,
       to: this.to,

@@ -35,7 +35,7 @@ None: Cookies are sent with all requests, even cross-site ones initiated through
     role: user.role,
   });
 }
-exports.signUp = catchAsync(async (req, res) => {
+exports.signUp = catchAsync(async (req, res, next) => {
   const { name, email, password, passwordConfirm, role, passwordChangedAt } =
     req.body;
   const user = await User.create({
@@ -49,21 +49,10 @@ exports.signUp = catchAsync(async (req, res) => {
   const Mail = new Email(user, 'http://localhost:3000/home');
   try {
     await Mail.sendWelcomeMessage();
-    console.log('mail sent success');
   } catch (error) {
-    console.log('mail sent unsuccess');
-    console.log('error', error);
+    next(error, 400);
   }
   createSendToken(user, 201, res);
-  console.log('Sending Welcome Message check for logs for production');
-  //   const token = signToken(user._id);
-  //   res.status(201).json({
-  //     status: 'success',
-  //     token,
-  //     data: {
-  //       user,
-  //     },
-  //   });
 });
 exports.signIn = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
@@ -151,7 +140,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     passwordResetToken: hashedResetToken,
     passwodResetTokenExpires: { $gte: Date.now() },
   });
-  console.log(user);
   if (!user) {
     next(
       new AppError(
